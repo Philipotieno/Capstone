@@ -56,4 +56,38 @@ def create_app(config_name):
         except:
             abort(422)
 
+    # Error Handling
+
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({
+            "success": False,
+            "error": 400,
+            "message": "Bad request"
+        }), 400
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            "success": False,
+            "error": 404,
+            "message": "Resource not found"
+        }), 404
+
+    @app.errorhandler(409)
+    def duplicate(error):
+        return jsonify({
+            "success": False,
+            "error": 409,
+            "message": "Duplicate found"
+        }), 409
+
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return jsonify({
+            "success": False,
+            "error": 422,
+            "message": "Unprocessable"
+        }), 422
+
     return app
