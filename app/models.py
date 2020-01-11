@@ -1,17 +1,17 @@
 from app import db
 
 
-class Actors(db.Model):
+class Actor(db.Model):
     """ This calss represents the actors table"""
 
     __tablename__ = 'actors'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
-    age = db.Column(db.String(255))
+    age = db.Column(db.Integer)
     gender = db.Column(db.String(10))
 
-    def __init__(self, name):
+    def __init__(self, name, age, gender):
         """initialize with name."""
         self.name = name
         self.age = age
@@ -29,11 +29,16 @@ class Actors(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def __repr__(self):
-        return "<Actors: {}>".format(self.Actors)
+    def format(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'age': self.age,
+            'gender': self.gender
+        }
 
 
-class Movies(db.Model):
+class Movie(db.Model):
     """ This calss represents the movies table"""
 
     __tablename__ = 'movies'
@@ -42,7 +47,7 @@ class Movies(db.Model):
     title = db.Column(db.String(255))
     release_date = db.Column(db.DateTime)
 
-    def __init__(self, name):
+    def __init__(self, title, release_date):
         """initialize with name."""
         self.title = title
         self.release_date = release_date
@@ -60,4 +65,4 @@ class Movies(db.Model):
         db.session.commit()
 
     def __repr__(self):
-        return "<Movies: {}>".format(self.title)
+        return "<Movie: {}>".format(self.title)
