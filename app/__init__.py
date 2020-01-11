@@ -18,5 +18,9 @@ def create_app(config_name):
     app.config.from_pyfile('config.py')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
+    
+    @app.route('/')
+    def get_all_actors():
+        return 'There are no actors'
 
     return app
