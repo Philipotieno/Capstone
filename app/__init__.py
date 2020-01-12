@@ -1,6 +1,7 @@
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from app.validate import validate_actor, validate_movie
+from app.auth import AuthError, requires_auth
 
 # local import
 from instance.config import app_config
@@ -22,7 +23,8 @@ def create_app(config_name):
     db.init_app(app)
 
     @app.route('/actors', methods=['POST'])
-    def create_actors():
+    @requires_auth('post:actors')
+    def create_actors(payload):
         data = request.get_json()
         try:
             if validate_actor(data):
@@ -89,5 +91,13 @@ def create_app(config_name):
             "error": 422,
             "message": "Unprocessable"
         }), 422
-
+        
+    @app.errorhandler(AuthError)
+    def auth_error(error):
+        return jsonify({
+            "success": False,
+            "error": error.status_code,
+            "message": error.error
+        }), error.status_code
+        
     return app
