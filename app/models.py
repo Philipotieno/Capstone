@@ -21,10 +21,6 @@ class Actor(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    @staticmethod
-    def get_all():
-        return Actors.query.all()
-
     def delete(self):
         db.session.delete(self)
         db.session.commit()
