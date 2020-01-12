@@ -67,9 +67,29 @@ def create_app(config_name):
             return jsonify({
                 'success': True,
                 'actors': actors
-            })
+            }), 200
         except:
             abort(422)
+
+    @app.route('/actors/<int:id>')
+    def get_one_actor(id):
+        actor = Actor.query.filter(Actor.id == id).one_or_none()
+        if actor:
+            try:
+                obj = {
+                    'id': actor.id,
+                    'name': actor.name,
+                    'age': actor.age,
+                    'gender': actor.gender
+                }
+                return jsonify({
+                    'success': True,
+                    'actor': obj
+                }), 201
+            except:
+                abort(422)
+        else:
+            abort(404)
 
     # Error Handling
 
