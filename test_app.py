@@ -37,6 +37,9 @@ class ActorsMoviesTestCase(unittest.TestCase):
             "age": 12,
             "gender": "male"
         }
+        self.assistant = os.getenv('ASSISTANT')
+        self.producer = os.getenv('PRODUCER')
+        self.director = os.getenv('DIRECTOR')
 
         # Binds the app to the current context
         with self.app.app_context():
@@ -44,20 +47,38 @@ class ActorsMoviesTestCase(unittest.TestCase):
 
     def test_create_actor(self):
         """Test Valid Post request for an actor"""
-        res = self.client().post('/actors', json=self.actor)
+        res = self.client().post('/actors',
+                                 json=self.actor,
+                                 headers={'Authorization': self.director})
+        
         self.assertEqual(res.status_code, 201)
         self.assertEqual(res.get_json()['success'], True)
-
+        
+    def test_create_actor_no_auth(self):
+        """Test Post request for an actor with no header auth"""
+        res = self.client().post('/actors',
+                                 json=self.actor)
+        
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(res.get_json()['success'], False)
+        # self.assertEqual(data['description'], 'Authorization header must start with "Bearer".')
+        
     def test_400_create_actor(self):
         """Test invalid age Post request for an actor"""
-        res = self.client().post('/actors', json=self.actor_one)
+        res = self.client().post('/actors',
+                                 json=self.actor_one,
+                                 headers={'Authorization': self.director})
+                                 
         self.assertEqual(res.status_code, 400)
         self.assertEqual(
-            data['message'], 'Please input a valid age between 1-105!')
+            res.get_json()['message'], 'Please input a valid age between 1-105!')
 
     def test_400_create_actor(self):
         """Test Post request for an actor with a missing field"""
-        res = self.client().post('/actors', json=self.actor_two)
+        res = self.client().post('/actors',
+                                 json=self.actor_two,
+                                 headers={'Authorization': self.director})
+        
         self.assertEqual(res.status_code, 400)
         self.assertEqual(res.get_json()['success'], False)
         self.assertEqual(res.get_json()['message'], 'Bad request')
@@ -66,10 +87,15 @@ class ActorsMoviesTestCase(unittest.TestCase):
         """Test Post request for an actor who has already been posted"""
 
         # post an actor
-        self.client().post('/actors', json=self.actor)
+        self.client().post('/actors',
+                           json=self.actor,
+                           headers={'Authorization': self.director})
 
         # post the same actor again
-        res = self.client().post('/actors', json=self.actor)
+        res = self.client().post('/actors',
+                                 json=self.actor,
+                                 headers={'Authorization': self.director})
+        
         self.assertEqual(res.status_code, 409)
         self.assertEqual(res.get_json()['success'], False)
         self.assertEqual(res.get_json()['message'], 'Duplicate found')
