@@ -91,6 +91,20 @@ def create_app(config_name):
         else:
             abort(404)
 
+    @app.route('/actors/<int:id>', methods=['DELETE'])
+    def delete_actor(id):
+        actor = Actor.query.filter(Actor.id == id).first()
+        if actor:
+            try:
+                actor.delete()
+                return jsonify({
+                    'success': True,
+                    'deleted': id
+                }), 201
+            except:
+                abort(422)
+        else:
+            abort(404)
     # Error Handling
 
     @app.errorhandler(400)
