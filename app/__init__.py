@@ -57,6 +57,19 @@ def create_app(config_name):
             }), 201
         except:
             abort(422)
+            
+    @app.route('/actors')
+    def get_all_actors():
+        try:
+            actors = Actor.query.all()
+            actors = [actor.format() for actor in actors]
+            
+            return jsonify({
+                'success': True,
+                'actors': actors
+            })
+        except:
+            abort(422)
 
     # Error Handling
 
