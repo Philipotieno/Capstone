@@ -114,8 +114,32 @@ class ActorsMoviesTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
 
     def test_404_get_all_actors(self):
-        """Test getting all actors"""
+        """Test getting list of empty actors"""
         res = self.client().get('/actors',
+                                headers={'Authorization': self.director})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+
+    def test_get_one_actor(self):
+        """Test getting one actors"""
+        self.client().post('/actors',
+                           json=self.actor,
+                           headers={'Authorization': self.director})
+        
+        res = self.client().get('/actors/1',
+                                headers={'Authorization': self.director})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+    def test_404_get_one_actor(self):
+        """Test getting all actors"""
+        res = self.client().get('/actors/1',
                                 headers={'Authorization': self.director})
 
         data = json.loads(res.data)
