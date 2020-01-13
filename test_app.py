@@ -41,9 +41,8 @@ class ActorsMoviesTestCase(unittest.TestCase):
         }
 
         self.movie = {
-            "name": "test actor",
-            "age": 12,
-            "gender": "male"
+            "title": "test movie",
+            "release_date": "12-12-2022"
         }
         self.assistant = os.getenv('ASSISTANT')
         self.producer = os.getenv('PRODUCER')
@@ -208,6 +207,24 @@ class ActorsMoviesTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 409)
         self.assertEqual(data['message'], 'details upto date')
+
+    def test_post_movie(self):
+        """Test Valid Post request for a movie"""
+        res = self.client().post('/movies',
+                                 json=self.movie,
+                                 headers={'Authorization': self.producer})
+
+        self.assertEqual(res.status_code, 201)
+        self.assertEqual(res.get_json()['success'], True)
+
+    def test_403_post_movie_non_role(self):
+        """Test Posting a movie for a non authorised user RBAC"""
+        res = self.client().post('/movies',
+                                 json=self.movie,
+                                 headers={'Authorization': self.director})
+
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(res.get_json()['success'], False)
 
     def tearDown(self):
         """teardown all initialized variables."""
