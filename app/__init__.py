@@ -192,6 +192,24 @@ def create_app(config_name):
         except:
             abort(422)
 
+    @app.route('/movies')
+    @requires_auth('get:movies')
+    def get_all_movies(payload):
+        movies = Movie.query.order_by(Movie.id).all()
+
+        if len(movies) != 0:
+            try:
+                movies = [movie.format() for movie in movies]
+
+                return jsonify({
+                    'success': True,
+                    'movies': movies
+                }), 200
+            except:
+                abort(422)
+        else:
+            abort(404)
+
     # Error Handling
 
     @app.errorhandler(400)
