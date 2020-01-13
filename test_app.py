@@ -49,10 +49,9 @@ class ActorsMoviesTestCase(unittest.TestCase):
             "title": "test update",
             "release_date": "12-12-2022"
         }
-        
-        self.assistant = os.getenv('ASSISTANT')
-        self.producer = os.getenv('PRODUCER')
-        self.director = os.getenv('DIRECTOR')
+
+        self.director = os.getenv('CREATIVE_DIRECTOR')
+        self.producer = os.getenv('EXECUTIVE_PRODUCER')
 
         # Binds the app to the current context
         with self.app.app_context():
@@ -254,7 +253,7 @@ class ActorsMoviesTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
-    
+
     def test_delete_one_movie(self):
         """Test deleteing a movie"""
         self.client().post('/movies',
