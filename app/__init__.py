@@ -246,6 +246,48 @@ def create_app(config_name):
         else:
             abort(404)
 
+    @app.route('/movies/<int:id>', methods=['PATCH'])
+    @requires_auth('patch:movies')
+    def update_movies_title(payload, id):
+        movie = Movie.query.filter_by(id=id).first()
+
+        if not movie:
+            abort(404)
+
+        data = request.get_json()
+
+        try:
+            if validate_movie(data):
+                return validate_movie(data)
+        except(TypeError, KeyError):
+            abort(400)
+
+        # check if drink name exists
+        title = request.get_json()['title'].rstrip().title()
+        if Movie.query.filter_by(title=title).first():
+            return jsonify({
+                'message': "details upto date"
+            }), 409
+
+        try:
+            title = ' '.join(data['title'].split())
+
+            if request.get_json().get('title'):
+                movie.title = title.title()
+
+            movie.update()
+            obj = {
+                'id': movie.id,
+                'name': movie.title,
+                'release_date': movie.release_date
+            }
+            return jsonify({
+                'success': True,
+                'actors': [obj]
+            }), 200
+        except:
+            abort(422)
+
     # Error Handling
 
     @app.errorhandler(400)
