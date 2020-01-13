@@ -61,7 +61,7 @@ def create_app(config_name):
     @app.route('/actors')
     def get_all_actors():
         try:
-            actors = Actor.query.all()
+            actors = Actor.query.order_by(Actor.name).all()
             actors = [actor.format() for actor in actors]
             
             return jsonify({
@@ -85,7 +85,7 @@ def create_app(config_name):
                 return jsonify({
                     'success': True,
                     'actor': obj
-                }), 201
+                }), 200
             except:
                 abort(422)
         else:
@@ -100,11 +100,52 @@ def create_app(config_name):
                 return jsonify({
                     'success': True,
                     'deleted': id
-                }), 201
+                }), 200
             except:
                 abort(422)
         else:
             abort(404)
+            
+    @app.route('/actors/<int:id>', methods=['PATCH'])
+    def update_actors_name(id):
+        actor = Actor.query.filter_by(id=id).first()
+        
+        if not actor:
+            abort(404)
+            
+        data = request.get_json()
+            
+        try:
+            if validate_actor(data):
+                return validate_actor(data)
+        except(TypeError, KeyError):
+            abort(400)
+
+        # check if drink name exists
+        name = request.get_json()['name'].rstrip().title()
+        if Actor.query.filter_by(name=name).first():
+            abort(409)
+
+        try:
+            name = ' '.join(data['name'].split())
+            
+            if request.get_json().get('name'):
+                actor.name=name.title()
+                
+            actor.update()
+            obj = {
+                'id': actor.id,
+                'name': actor.name,
+                'age': actor.age,
+                'gender': actor.gender
+            }
+            return jsonify({
+                'success': True,
+                'actors': [obj]
+            }), 200
+        except:
+            abort(422)
+
     # Error Handling
 
     @app.errorhandler(400)
