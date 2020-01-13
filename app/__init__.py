@@ -186,7 +186,7 @@ def create_app(config_name):
         return jsonify({
             "success": False,
             "error": 422,
-            "message": "Unprocessable"
+            "message": "Unable to process request"
         }), 422
 
     @app.errorhandler(AuthError)
