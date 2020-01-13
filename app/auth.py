@@ -1,9 +1,10 @@
 import json
-from flask import request, _request_ctx_stack
+import os
 from functools import wraps
-from jose import jwt
 from urllib.request import urlopen
 
+from flask import _request_ctx_stack, request
+from jose import jwt
 
 AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
 ALGORITHMS = ['RS256']
@@ -112,9 +113,9 @@ def verify_decode_jwt(token):
                 'description': 'Unable to parse authentication token.'
             }, 400)
     raise AuthError({
-                'code': 'invalid_header',
+        'code': 'invalid_header',
                 'description': 'Unable to find the appropriate key.'
-            }, 400)
+    }, 400)
 
 
 def requires_auth(permission=''):
