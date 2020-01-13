@@ -158,8 +158,8 @@ def create_app(config_name):
     # Movies
 
     @app.route('/movies', methods=['POST'])
-    # @requires_auth('post:movies')
-    def create_movies():
+    @requires_auth('post:movies')
+    def create_movies(payload):
         data = request.get_json()
         try:
             if validate_movie(data):
