@@ -155,6 +155,43 @@ def create_app(config_name):
         except:
             abort(422)
 
+    # Movies
+
+    @app.route('/movies', methods=['POST'])
+    # @requires_auth('post:movies')
+    def create_movies():
+        data = request.get_json()
+        try:
+            if validate_movie(data):
+                return validate_movie(data)
+        except(TypeError, KeyError):
+            abort(400)
+
+        # check if movie title exists
+        title = request.get_json()['title'].rstrip().title()
+        if Movie.query.filter_by(title=title).first():
+            abort(409)
+
+        try:
+            title = ' '.join(data['title'].split())
+            movie = Movie(
+                title.title(),
+                data['release_date']
+            )
+            movie.save()
+            obj = {
+                'id': movie.id,
+                'title': movie.title,
+                'release_date': movie.release_date
+            }
+
+            return jsonify({
+                'success': True,
+                'movie': [obj]
+            }), 201
+        except:
+            abort(422)
+
     # Error Handling
 
     @app.errorhandler(400)
