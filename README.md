@@ -42,6 +42,14 @@
             User 2 - Casting Director
             User 3 - Executive Producer
     - Sign into each account and make note of the JWT.
+    ```
+        GET https://YOUR_DOMAIN/authorize?
+            audience=YOUR_AUDIENCE&
+            response_type=token&
+            client_id=YOUR_CLIENT_ID&
+            redirect_uri=https://callbackurl&
+
+    ```
     - Import the postman collection `./starter_code/backend/udacity-fsnd-udaspicelatte.postman_collection.json`
     - Right-clicking the collection folder for Casting Assistant, Casting Director, and Executive Producer
     - Navigate to the authorization tab, and including the JWT in the token field (you should have noted these JWTs).
@@ -104,17 +112,16 @@ $ python test_app.py
 ### POST '/actors'
 
 - Adds a new actor
-- Request Arguments: Question body
+- Authorization required: Casting Director
+- Request Arguments: Actors body
 
 ```
 - Actors body: 
 
-```json5
 {
-    "age": 16,
-    "gender": "Male",
-    "id": 50,
-    "name": "Ptte Dfd"
+    "name": "Brad Pitt",
+    "age": 56,
+    "gender": "Male"
 }
 ```
 - Returns: 
@@ -125,10 +132,158 @@ $ python test_app.py
         {
             "age": 16,
             "gender": "Male",
-            "id": 50,
-            "name": "Ptte Dfd"
+            "id": 56,
+            "name": "Brad Pitt"
         }
     ],
     "success": true
 }
 ```
+### GET '/actors'
+
+- Fetches a dictionary of all actors
+- Authorisation required: Casting Assistant/Casting Director/Executive Producer
+- Returns: 
+
+```json5
+{
+    "actors": [
+        {
+            "age": 65,
+            "gender": "Male",
+            "id": 2,
+            "name": "Brad"
+        },
+        {
+            "age": 65,
+            "gender": "Male",
+            "id": 1,
+            "name": "Jim Carrey"
+        }
+    ],
+    "success": true
+}
+```
+
+### GET '/actors/1'
+
+- Fetches a dictionary of one actor
+- Authorization required: Casting Assistant/Casting Director/Executive Producer
+- Returns: 
+
+```json5
+{
+    "actor": {
+        "age": 65,
+        "gender": "Male",
+        "id": 1,
+        "name": "Jim Carrey"
+    },
+    "success": true
+}
+```
+
+### DELETE '/actors/1'
+
+- Deletes an actor
+- Authorization required: Casting Director
+- Returns: 
+
+```json5
+{
+    "deleted": 2,
+    "success": true
+}
+```
+### PATCH '/actors/1'
+
+- update actors name
+- Authorization required: Casting Director
+- Request Arguments: Actors body
+
+```
+- Actors body: 
+
+```json5
+{
+    "name": "Brad Pitt Jr",
+    "age": 56,
+    "gender": "Male"
+}
+```
+- Returns: 
+
+```json5
+{
+    "actors": [
+        {
+            "age": 16,
+            "gender": "Male",
+            "id": 56,
+            "name": "Brad Pitt Jr"
+        }
+    ],
+    "success": true
+}
+```
+
+
+
+
+
+
+
+## Errors
+
+### Bad request (400)
+
+```json5
+{
+  'success': false,
+  'error': 400,
+  'message': 'Bad request'
+}
+```
+
+### Not found  (404)
+
+```json5
+{
+  'success': false,
+  'error': 404,
+  'message': 'Resource Not Found'
+}
+```
+
+### Unprocessable request (422)
+
+```json5
+{
+  'success': false,
+  'error': 422,
+  'message': 'Unable to process request'
+}
+```
+### Duplicate (409)
+
+```json5
+{
+  'success': false,
+  'error': 409,
+  'message': 'Duplicate found'
+}
+
+### Internal server error (500)
+
+```json5
+{
+  'success': false,
+  'error': 500,
+  'message': 'Internal server error'
+}
+```
+
+https://moviecast.auth0.com/authorize?audience=moviecast&
+  response_type=token&
+  client_id=Q4o4NhFT3MxMWfgFLIv5T0ZS0L5pMJD1&
+  redirect_uri=http://localhost:8080
