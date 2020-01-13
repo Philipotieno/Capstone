@@ -12,7 +12,7 @@ class ActorsMoviesTestCase(unittest.TestCase):
         self.app = create_app(config_name="testing")
         self.client = self.app.test_client
 
-        # Valid actor detaills
+        # Valid actor details
         self.actor = {
             "name": "test actor",
             "age": 12,
@@ -23,6 +23,13 @@ class ActorsMoviesTestCase(unittest.TestCase):
         self.actor_one = {
             "name": "test actor",
             "age": 412,
+            "gender": "male"
+        }
+
+        # Valid actor details
+        self.actor_three = {
+            "name": "test actor two",
+            "age": 12,
             "gender": "male"
         }
 
@@ -128,7 +135,7 @@ class ActorsMoviesTestCase(unittest.TestCase):
         self.client().post('/actors',
                            json=self.actor,
                            headers={'Authorization': self.director})
-        
+
         res = self.client().get('/actors/1',
                                 headers={'Authorization': self.director})
 
@@ -138,7 +145,7 @@ class ActorsMoviesTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
 
     def test_404_get_one_actor(self):
-        """Test getting all actors"""
+        """Test getting non existing actor"""
         res = self.client().get('/actors/1',
                                 headers={'Authorization': self.director})
 
@@ -146,6 +153,60 @@ class ActorsMoviesTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
+
+    def test_delete_one_actor(self):
+        """Test deleting non existing actor"""
+        self.client().post('/actors',
+                           json=self.actor,
+                           headers={'Authorization': self.director})
+
+        res = self.client().delete('/actors/1',
+                                   headers={'Authorization': self.director})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+    def test_404_delete_one_actor(self):
+        """Test deleting one actors"""
+        res = self.client().delete('/actors/1',
+                                   headers={'Authorization': self.director})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+
+    def test_update_actors_details(self):
+        """Test updating actors details"""
+        self.client().post('/actors',
+                           json=self.actor,
+                           headers={'Authorization': self.director})
+
+        res = self.client().patch('/actors/1',
+                                  json=self.actor_three,
+                                  headers={'Authorization': self.director})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+    def test_409_update_actors_details_with_same_details(self):
+        """Test updating actors details with same details"""
+        self.client().post('/actors',
+                           json=self.actor,
+                           headers={'Authorization': self.director})
+
+        res = self.client().patch('/actors/1',
+                                  json=self.actor,
+                                  headers={'Authorization': self.director})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 409)
+        self.assertEqual(data['message'], 'details upto date')
 
     def tearDown(self):
         """teardown all initialized variables."""
