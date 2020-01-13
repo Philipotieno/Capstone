@@ -1,9 +1,8 @@
-from flask import Flask, request, abort, jsonify
+from flask import Flask, abort, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from app.validate import validate_actor, validate_movie
-from app.auth import AuthError, requires_auth
 
-# local import
+from app.auth import AuthError, requires_auth
+from app.validate import validate_actor, validate_movie
 from instance.config import app_config
 
 # initialize sql-alchemy
@@ -57,22 +56,28 @@ def create_app(config_name):
             }), 201
         except:
             abort(422)
-            
+
     @app.route('/actors')
-    def get_all_actors():
-        try:
-            actors = Actor.query.order_by(Actor.name).all()
-            actors = [actor.format() for actor in actors]
-            
-            return jsonify({
-                'success': True,
-                'actors': actors
-            }), 200
-        except:
-            abort(422)
+    @requires_auth('get:actors')
+    def get_all_actors(payload):
+        actors = Actor.query.order_by(Actor.name).all()
+
+        if len(actors) != 0:
+            try:
+                actors = [actor.format() for actor in actors]
+
+                return jsonify({
+                    'success': True,
+                    'actors': actors
+                }), 200
+            except:
+                abort(422)
+        else:
+            abort(404)
 
     @app.route('/actors/<int:id>')
-    def get_one_actor(id):
+    @requires_auth('get:actors')
+    def get_one_actor(payload, id):
         actor = Actor.query.filter(Actor.id == id).one_or_none()
         if actor:
             try:
@@ -92,7 +97,8 @@ def create_app(config_name):
             abort(404)
 
     @app.route('/actors/<int:id>', methods=['DELETE'])
-    def delete_actor(id):
+    @requires_auth('delete:actors')
+    def delete_actor(payload, id):
         actor = Actor.query.filter(Actor.id == id).first()
         if actor:
             try:
@@ -105,16 +111,17 @@ def create_app(config_name):
                 abort(422)
         else:
             abort(404)
-            
+
     @app.route('/actors/<int:id>', methods=['PATCH'])
-    def update_actors_name(id):
+    @requires_auth('patch:actors')
+    def update_actors_name(payload, id):
         actor = Actor.query.filter_by(id=id).first()
-        
+
         if not actor:
             abort(404)
-            
+
         data = request.get_json()
-            
+
         try:
             if validate_actor(data):
                 return validate_actor(data)
@@ -124,14 +131,16 @@ def create_app(config_name):
         # check if drink name exists
         name = request.get_json()['name'].rstrip().title()
         if Actor.query.filter_by(name=name).first():
-            abort(409)
+            return jsonify({
+                'message': "details upto date"
+            }), 409
 
         try:
             name = ' '.join(data['name'].split())
-            
+
             if request.get_json().get('name'):
-                actor.name=name.title()
-                
+                actor.name = name.title()
+
             actor.update()
             obj = {
                 'id': actor.id,
@@ -179,7 +188,7 @@ def create_app(config_name):
             "error": 422,
             "message": "Unprocessable"
         }), 422
-        
+
     @app.errorhandler(AuthError)
     def auth_error(error):
         return jsonify({
@@ -187,5 +196,5 @@ def create_app(config_name):
             "error": error.status_code,
             "message": error.error
         }), error.status_code
-        
+
     return app

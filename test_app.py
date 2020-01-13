@@ -1,6 +1,7 @@
-import unittest
-import os
 import json
+import os
+import unittest
+
 from app import create_app, db
 
 
