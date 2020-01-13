@@ -210,6 +210,26 @@ def create_app(config_name):
         else:
             abort(404)
 
+    @app.route('/movies/<int:id>')
+    @requires_auth('get:movies')
+    def get_one_movie(payload, id):
+        movie = Movie.query.filter(Movie.id == id).one_or_none()
+        if movie:
+            try:
+                obj = {
+                    'id': movie.id,
+                    'title': movie.title,
+                    'release_date': movie.release_date
+                }
+                return jsonify({
+                    'success': True,
+                    'movie': obj
+                }), 200
+            except:
+                abort(422)
+        else:
+            abort(404)
+
     @app.route('/movies/<int:id>', methods=['DELETE'])
     @requires_auth('delete:movies')
     def delete_movie(payload, id):
