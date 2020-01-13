@@ -44,6 +44,12 @@ class ActorsMoviesTestCase(unittest.TestCase):
             "title": "test movie",
             "release_date": "12-12-2022"
         }
+
+        self.movie_update = {
+            "title": "test update",
+            "release_date": "12-12-2022"
+        }
+        
         self.assistant = os.getenv('ASSISTANT')
         self.producer = os.getenv('PRODUCER')
         self.director = os.getenv('DIRECTOR')
@@ -296,6 +302,36 @@ class ActorsMoviesTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
+
+    def test_update_movie_title(self):
+        """Test updating movie title"""
+        self.client().post('/movies',
+                           json=self.movie,
+                           headers={'Authorization': self.producer})
+
+        res = self.client().patch('/movies/1',
+                                  json=self.movie_update,
+                                  headers={'Authorization': self.director})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+    def test_409_update_movie_title_with_same_details(self):
+        """Test updating movies title with same details"""
+        self.client().post('/movies',
+                           json=self.movie,
+                           headers={'Authorization': self.producer})
+
+        res = self.client().patch('/movies/1',
+                                  json=self.movie,
+                                  headers={'Authorization': self.director})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 409)
+        self.assertEqual(data['message'], 'details upto date')
 
     def tearDown(self):
         """teardown all initialized variables."""
