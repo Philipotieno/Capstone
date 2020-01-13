@@ -43,7 +43,7 @@ class ActorsMoviesTestCase(unittest.TestCase):
         self.movie = {
             "title": "test movie",
             "release_date": "12-12-2022"
-        }
+        }gi
 
         self.movie_update = {
             "title": "test update",
