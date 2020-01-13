@@ -226,6 +226,29 @@ class ActorsMoviesTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 403)
         self.assertEqual(res.get_json()['success'], False)
 
+    def test_get_all_movies(self):
+        """Test getting all movies"""
+        self.client().post('/movies',
+                           json=self.movie,
+                           headers={'Authorization': self.producer})
+
+        res = self.client().get('/movies',
+                                headers={'Authorization': self.producer})
+
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+    def test_404_get_all_movies(self):
+        """Test getting list of empty movies"""
+        res = self.client().get('/movies',
+                                headers={'Authorization': self.producer})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+
     def tearDown(self):
         """teardown all initialized variables."""
         with self.app.app_context():
