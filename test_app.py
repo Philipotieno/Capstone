@@ -41,13 +41,17 @@ class ActorsMoviesTestCase(unittest.TestCase):
         }
 
         self.movie = {
-            "name": "test actor",
-            "age": 12,
-            "gender": "male"
+            "title": "test movie",
+            "release_date": "12-12-2022"
+        }gi
+
+        self.movie_update = {
+            "title": "test update",
+            "release_date": "12-12-2022"
         }
-        self.assistant = os.getenv('ASSISTANT')
-        self.producer = os.getenv('PRODUCER')
-        self.director = os.getenv('DIRECTOR')
+
+        self.director = os.getenv('CREATIVE_DIRECTOR')
+        self.producer = os.getenv('EXECUTIVE_PRODUCER')
 
         # Binds the app to the current context
         with self.app.app_context():
@@ -202,6 +206,125 @@ class ActorsMoviesTestCase(unittest.TestCase):
 
         res = self.client().patch('/actors/1',
                                   json=self.actor,
+                                  headers={'Authorization': self.director})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 409)
+        self.assertEqual(data['message'], 'details upto date')
+
+    def test_post_movie(self):
+        """Test Valid Post request for a movie"""
+        res = self.client().post('/movies',
+                                 json=self.movie,
+                                 headers={'Authorization': self.producer})
+
+        self.assertEqual(res.status_code, 201)
+        self.assertEqual(res.get_json()['success'], True)
+
+    def test_403_post_movie_non_role(self):
+        """Test Posting a movie for a non authorised user RBAC"""
+        res = self.client().post('/movies',
+                                 json=self.movie,
+                                 headers={'Authorization': self.director})
+
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(res.get_json()['success'], False)
+
+    def test_get_all_movies(self):
+        """Test getting all movies"""
+        self.client().post('/movies',
+                           json=self.movie,
+                           headers={'Authorization': self.producer})
+
+        res = self.client().get('/movies',
+                                headers={'Authorization': self.producer})
+
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+    def test_404_get_all_movies(self):
+        """Test getting list of empty movies"""
+        res = self.client().get('/movies',
+                                headers={'Authorization': self.producer})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+
+    def test_delete_one_movie(self):
+        """Test deleteing a movie"""
+        self.client().post('/movies',
+                           json=self.movie,
+                           headers={'Authorization': self.producer})
+
+        res = self.client().delete('/movies/1',
+                                   headers={'Authorization': self.producer})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+    def test_404_delete_none_movies(self):
+        """Test deleting non existing movie"""
+        res = self.client().delete('/movies/1',
+                                   headers={'Authorization': self.producer})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+
+    def test_get_one_movie(self):
+        """Test getting one movie"""
+        self.client().post('/movies',
+                           json=self.movie,
+                           headers={'Authorization': self.producer})
+
+        res = self.client().get('/movies/1',
+                                headers={'Authorization': self.producer})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+    def test_404_get_one_movie(self):
+        """Test getting non existing movie"""
+        res = self.client().get('/movies/1',
+                                headers={'Authorization': self.producer})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+
+    def test_update_movie_title(self):
+        """Test updating movie title"""
+        self.client().post('/movies',
+                           json=self.movie,
+                           headers={'Authorization': self.producer})
+
+        res = self.client().patch('/movies/1',
+                                  json=self.movie_update,
+                                  headers={'Authorization': self.director})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+    def test_409_update_movie_title_with_same_details(self):
+        """Test updating movies title with same details"""
+        self.client().post('/movies',
+                           json=self.movie,
+                           headers={'Authorization': self.producer})
+
+        res = self.client().patch('/movies/1',
+                                  json=self.movie,
                                   headers={'Authorization': self.director})
 
         data = json.loads(res.data)

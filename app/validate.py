@@ -58,7 +58,7 @@ def validate_gender(data):
 
 
 def validate_date(data):
-    """Validate topic"""
+    """Validate date"""
     try:
         if datetime.datetime.strptime(data['release_date'], '%d-%m-%Y'):
             pass
@@ -67,7 +67,7 @@ def validate_date(data):
         return jsonify({'message': msg}), 400
 
     if datetime.datetime.strptime(data['release_date'], '%d-%m-%Y') < now:
-        msg = "Date cannot be earlier than today"
+        msg = "Date cannot be earlier than today or now"
         return jsonify({'message': msg}), 400
 
 

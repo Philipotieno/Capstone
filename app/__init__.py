@@ -155,6 +155,139 @@ def create_app(config_name):
         except:
             abort(422)
 
+    # Movies
+
+    @app.route('/movies', methods=['POST'])
+    @requires_auth('post:movies')
+    def create_movies(payload):
+        data = request.get_json()
+        try:
+            if validate_movie(data):
+                return validate_movie(data)
+        except(TypeError, KeyError):
+            abort(400)
+
+        # check if movie title exists
+        title = request.get_json()['title'].rstrip().title()
+        if Movie.query.filter_by(title=title).first():
+            abort(409)
+
+        try:
+            title = ' '.join(data['title'].split())
+            movie = Movie(
+                title.title(),
+                data['release_date']
+            )
+            movie.save()
+            obj = {
+                'id': movie.id,
+                'title': movie.title,
+                'release_date': movie.release_date
+            }
+
+            return jsonify({
+                'success': True,
+                'movie': [obj]
+            }), 201
+        except:
+            abort(422)
+
+    @app.route('/movies')
+    @requires_auth('get:movies')
+    def get_all_movies(payload):
+        movies = Movie.query.order_by(Movie.id).all()
+
+        if len(movies) != 0:
+            try:
+                movies = [movie.format() for movie in movies]
+
+                return jsonify({
+                    'success': True,
+                    'movies': movies
+                }), 200
+            except:
+                abort(422)
+        else:
+            abort(404)
+
+    @app.route('/movies/<int:id>')
+    @requires_auth('get:movies')
+    def get_one_movie(payload, id):
+        movie = Movie.query.filter(Movie.id == id).one_or_none()
+        if movie:
+            try:
+                obj = {
+                    'id': movie.id,
+                    'title': movie.title,
+                    'release_date': movie.release_date
+                }
+                return jsonify({
+                    'success': True,
+                    'movie': obj
+                }), 200
+            except:
+                abort(422)
+        else:
+            abort(404)
+
+    @app.route('/movies/<int:id>', methods=['DELETE'])
+    @requires_auth('delete:movies')
+    def delete_movie(payload, id):
+        movie = Movie.query.filter(Movie.id == id).first()
+        if movie:
+            try:
+                movie.delete()
+                return jsonify({
+                    'success': True,
+                    'deleted': id
+                }), 200
+            except:
+                abort(422)
+        else:
+            abort(404)
+
+    @app.route('/movies/<int:id>', methods=['PATCH'])
+    @requires_auth('patch:movies')
+    def update_movies_title(payload, id):
+        movie = Movie.query.filter_by(id=id).first()
+
+        if not movie:
+            abort(404)
+
+        data = request.get_json()
+
+        try:
+            if validate_movie(data):
+                return validate_movie(data)
+        except(TypeError, KeyError):
+            abort(400)
+
+        # check if drink name exists
+        title = request.get_json()['title'].rstrip().title()
+        if Movie.query.filter_by(title=title).first():
+            return jsonify({
+                'message': "details upto date"
+            }), 409
+
+        try:
+            title = ' '.join(data['title'].split())
+
+            if request.get_json().get('title'):
+                movie.title = title.title()
+
+            movie.update()
+            obj = {
+                'id': movie.id,
+                'name': movie.title,
+                'release_date': movie.release_date
+            }
+            return jsonify({
+                'success': True,
+                'actors': [obj]
+            }), 200
+        except:
+            abort(422)
+
     # Error Handling
 
     @app.errorhandler(400)
