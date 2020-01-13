@@ -273,6 +273,30 @@ class ActorsMoviesTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
 
+    def test_get_one_movie(self):
+        """Test getting one movie"""
+        self.client().post('/movies',
+                           json=self.movie,
+                           headers={'Authorization': self.producer})
+
+        res = self.client().get('/movies/1',
+                                headers={'Authorization': self.producer})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+    def test_404_get_one_movie(self):
+        """Test getting non existing movie"""
+        res = self.client().get('/movies/1',
+                                headers={'Authorization': self.producer})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+
     def tearDown(self):
         """teardown all initialized variables."""
         with self.app.app_context():
