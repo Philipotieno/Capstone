@@ -210,6 +210,22 @@ def create_app(config_name):
         else:
             abort(404)
 
+    @app.route('/movies/<int:id>', methods=['DELETE'])
+    @requires_auth('delete:movies')
+    def delete_movie(payload, id):
+        movie = Movie.query.filter(Movie.id == id).first()
+        if movie:
+            try:
+                movie.delete()
+                return jsonify({
+                    'success': True,
+                    'deleted': id
+                }), 200
+            except:
+                abort(422)
+        else:
+            abort(404)
+
     # Error Handling
 
     @app.errorhandler(400)
