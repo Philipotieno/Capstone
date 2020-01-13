@@ -248,6 +248,30 @@ class ActorsMoviesTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
+    
+    def test_delete_one_movie(self):
+        """Test deleteing a movie"""
+        self.client().post('/movies',
+                           json=self.movie,
+                           headers={'Authorization': self.producer})
+
+        res = self.client().delete('/movies/1',
+                                   headers={'Authorization': self.producer})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+    def test_404_delete_none_movies(self):
+        """Test deleting non existing movie"""
+        res = self.client().delete('/movies/1',
+                                   headers={'Authorization': self.producer})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
 
     def tearDown(self):
         """teardown all initialized variables."""
