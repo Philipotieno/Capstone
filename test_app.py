@@ -50,35 +50,35 @@ class ActorsMoviesTestCase(unittest.TestCase):
         res = self.client().post('/actors',
                                  json=self.actor,
                                  headers={'Authorization': self.director})
-        
+
         self.assertEqual(res.status_code, 201)
         self.assertEqual(res.get_json()['success'], True)
-        
+
     def test_create_actor_no_auth(self):
         """Test Post request for an actor with no header auth"""
         res = self.client().post('/actors',
                                  json=self.actor)
-        
+
         self.assertEqual(res.status_code, 401)
         self.assertEqual(res.get_json()['success'], False)
-        # self.assertEqual(data['description'], 'Authorization header must start with "Bearer".')
-        
+
     def test_400_create_actor(self):
         """Test invalid age Post request for an actor"""
         res = self.client().post('/actors',
                                  json=self.actor_one,
                                  headers={'Authorization': self.director})
-                                 
+
         self.assertEqual(res.status_code, 400)
-        self.assertEqual(
-            res.get_json()['message'], 'Please input a valid age between 1-105!')
+        self.assertEqual(res.get_json()['message'],
+                         'Please input a valid age between 1-105!'
+                         )
 
     def test_400_create_actor(self):
         """Test Post request for an actor with a missing field"""
         res = self.client().post('/actors',
                                  json=self.actor_two,
                                  headers={'Authorization': self.director})
-        
+
         self.assertEqual(res.status_code, 400)
         self.assertEqual(res.get_json()['success'], False)
         self.assertEqual(res.get_json()['message'], 'Bad request')
@@ -95,10 +95,33 @@ class ActorsMoviesTestCase(unittest.TestCase):
         res = self.client().post('/actors',
                                  json=self.actor,
                                  headers={'Authorization': self.director})
-        
+
         self.assertEqual(res.status_code, 409)
         self.assertEqual(res.get_json()['success'], False)
         self.assertEqual(res.get_json()['message'], 'Duplicate found')
+
+    def test_get_all_actors(self):
+        """Test getting all actors"""
+        self.client().post('/actors',
+                           json=self.actor,
+                           headers={'Authorization': self.director})
+
+        res = self.client().get('/actors',
+                                headers={'Authorization': self.director})
+
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+    def test_404_get_all_actors(self):
+        """Test getting all actors"""
+        res = self.client().get('/actors',
+                                headers={'Authorization': self.director})
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
 
     def tearDown(self):
         """teardown all initialized variables."""
