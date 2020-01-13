@@ -55,13 +55,16 @@ class Movie(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    @staticmethod
-    def get_all():
-        return Movies.query.all()
+    def update(self):
+        db.session.commit()
 
     def delete(self):
         db.session.delete(self)
         db.session.commit()
 
-    def __repr__(self):
-        return "<Movie: {}>".format(self.title)
+    def format(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'release_date': self.release_date
+        }
