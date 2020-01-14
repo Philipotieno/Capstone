@@ -1,4 +1,5 @@
 # Coffee Shop Backend
+        (https://capstone-philip.herokuapp.com/)[https://capstone-philip.herokuapp.com/]
 
 ## Getting Started
 
@@ -50,7 +51,7 @@
             redirect_uri=https://callbackurl&
 
     ```
-    - Import the postman collection `./starter_code/backend/udacity-fsnd-udaspicelatte.postman_collection.json`
+    - Import the postman collection ``
     - Right-clicking the collection folder for Casting Assistant, Casting Director, and Executive Producer
     - Navigate to the authorization tab, and including the JWT in the token field (you should have noted these JWTs).
 
@@ -108,7 +109,10 @@ $ flask run --reload
 $ python test_app.py
 ```
 ## Endpoints...
-
+```
+    localhost:5000
+    heroku: https://capstone-philip.herokuapp.com/
+```
 ### POST '/actors'
 
 - Adds a new actor
