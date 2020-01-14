@@ -1,5 +1,5 @@
 # Coffee Shop Backend
-        (https://capstone-philip.herokuapp.com/)[https://capstone-philip.herokuapp.com/]
+ - [https://capstone-philip.herokuapp.com/](https://capstone-philip.herokuapp.com/)
 
 ## Getting Started
 
@@ -394,8 +394,3 @@ $ python test_app.py
   'message': 'Internal server error'
 }
 ```
-
-https://moviecast.auth0.com/authorize?audience=moviecast&
-  response_type=token&
-  client_id=Q4o4NhFT3MxMWfgFLIv5T0ZS0L5pMJD1&
-  redirect_uri=http://localhost:8080
