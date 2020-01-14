@@ -229,6 +229,114 @@ $ python test_app.py
 
 
 
+### POST '/movies'
+
+- Adds a new movies
+- Authorization required: Executive Producer
+- Request Arguments: movies body
+
+```json
+{
+    "title": "Mad Max",
+    "release_date": "5-6-2020"
+}
+```
+- Returns: 
+
+```json5
+{
+    "movie": [
+        {
+            "id": 14,
+            "release_date": "Sat, 02 Feb 3202 00:00:00 GMT",
+            "title": "Dark Night"
+        }
+    ],
+    "success": true
+}
+```
+### GET '/actors'
+
+- Fetches a dictionary of all movies
+- Authorisation required: Casting Assistant/Casting Director/Executive Producer
+- Returns: 
+
+```json5
+{
+    "movie": [
+        {
+            "id": 14,
+            "release_date": "Sat, 02 Feb 3202 00:00:00 GMT",
+            "title": "Dark Night"
+        },
+        {
+            "id": 14,
+            "release_date": "Sat, 02 Feb 3202 00:00:00 GMT",
+            "title": "Dark Night"
+        }
+    ],
+    "success": true
+}
+```
+
+### GET '/movie/1'
+
+- Fetches a dictionary of one movie
+- Authorization required: Casting Assistant/Casting Director/Executive Producer
+- Returns: 
+
+```json5
+{
+    "movie": [
+        {
+            "id": 14,
+            "release_date": "Sat, 02 Feb 3202 00:00:00 GMT",
+            "title": "Dark Night"
+        }
+    ],
+    "success": true
+}
+```
+
+### DELETE '/movie/1'
+
+- Deletes a movies
+- Authorization required: Executive Producer
+- Returns: 
+
+```json5
+{
+    "deleted": 2,
+    "success": true
+}
+```
+### PATCH '/movies/1'
+
+- Update movies title
+- Authorization required: Casting Director
+- Request Arguments: Movies body
+ 
+
+```json
+{
+    "title": "Mad Max",
+    "release_date": "5-6-2020"
+}
+```
+- Returns: 
+
+```json5
+{
+    "movie": [
+        {
+            "id": 14,
+            "release_date": "Sat, 02 Feb 3202 00:00:00 GMT",
+            "title": "Dark Night"
+        }
+    ],
+    "success": true
+}
+```
 
 
 
