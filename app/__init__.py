@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from app.auth import AuthError, requires_auth
 from app.validate import validate_actor, validate_movie
-from instance.config import app_config
+from .instance.config import app_config
 
 # initialize sql-alchemy
 db = SQLAlchemy()
